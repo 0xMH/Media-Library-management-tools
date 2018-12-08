@@ -25,4 +25,4 @@ Docker Compose file for the most known media management toold
 * [Ubooquity](https://vaemendis.net/ubooquity/)
    * eBook/AudioBook/Comic server: Web portal to manage my downloaded eBook/AudioBook/Comic content. 
 
-Thanks to r/creedofman for his amazing work.
+Thanks to [u/creedofman](https://www.reddit.com/user/creedofman) for his amazing work.
