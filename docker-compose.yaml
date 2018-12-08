@@ -1,0 +1,242 @@
+version: '2'
+##############
+# Networking #
+##############
+networks:
+  default:
+    external:
+      name: media
+##############
+# Containers #
+##############
+services:
+  ########
+  # Plex #
+  ########
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker:plexpass
+    restart: unless-stopped
+    ports:
+      - 32400:32400/tcp
+      - 3005:3005/tcp
+      - 8324:8324/tcp
+      - 32469:32469/tcp
+      - 1900:1900/udp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+      - PLEX_CLAIM=<PLEX_CLAIM_CODE>
+      - ADVERTISE_IP=<DOCKER_HOST_IP>
+    hostname: plex
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/plex/config:/config
+      - /path/to/transcode:/transcode
+      - /path/to/data/plex-media:/data
+  ############
+  # Tautulli #
+  ############
+  tautulli:
+    container_name: tautulli
+    image: shiggins8/tautulli:latest
+    restart: unless-stopped
+    ports:
+      - 8181:9191/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: tautulli
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/docker/tautulli/config:/config
+      - /path/to/plex/config/Library/Logs:/logs
+  ###########
+  # Jackett #
+  ###########
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    restart: unless-stopped
+    ports:
+      - 9117:9117/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: jackett
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/docker/jackett/config:/config
+      - /path/to/data/downloads/queue:/downloads
+  ##########
+  # Lidarr #
+  ##########
+  lidarr:
+    container_name: lidarr
+    image: 	linuxserver/lidarr:latest
+    restart: unless-stopped
+    ports:
+      - 8686:8686/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: lidarr
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/docker/lidarr/config:/config
+      - /path/to/data/downloads:/downloads
+      - /path/to/data/plex-media/Music:/music
+  ########
+  # Ombi #
+  ########
+  ombi:
+    container_name: ombi
+    image: 	linuxserver/ombi:latest
+    restart: unless-stopped
+    ports:
+      - 3579:3579/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: ombi
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/docker/ombi/config:/config
+  ##########
+  # Radarr #
+  ##########
+  radarr:
+    container_name: radarr
+    image: 	linuxserver/radarr:latest
+    restart: unless-stopped
+    ports:
+      - 7878:7878/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: radarr
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/docker/radarr/config:/config
+      - /path/to/data/downloads:/downloads
+      - /path/to/data/plex-media/Movies:/movies
+  ##########
+  # Sonarr #
+  ##########
+  sonarr:
+    container_name: sonarr
+    image: 	linuxserver/sonarr:latest
+    restart: unless-stopped
+    ports:
+      - 8989:8989/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: sonarr
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/data/plex-media/TV:/tv
+      - /path/to/docker/sonarr/config:/config
+      - /path/to/data/downloads:/downloads
+  ################
+  # Transmission #
+  ################
+  transmission:
+    container_name: transmission
+    image: 	linuxserver/transmission:148
+    restart: unless-stopped
+    ports:
+      - 51413:51413/tcp
+      - 51413:51413/udp
+      - 9091:9091/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    hostname: transmission
+    labels:
+      - stack=media
+    volumes:
+      - /path/to/docker/transmission/config:/config
+      - /path/to/data/downloads:/downloads/complete
+      - /path/to/downloads/incomplete:/downloads/incomplete
+      - /path/to/downloads/watch:/downloads/watch
+  #################
+  # LazyLibrarian #
+  #################
+  lazylibrarian:
+    container_name: lazylibrarian
+    image: linuxserver/lazylibrarian:latest
+    restart: unless-stopped
+    ports:
+      - 5299:5299/tcp
+    volumes:
+      - /path/to/docker/lazylibrarian/config:/config
+      - /path/to/data/books:/books
+      - /path/to/data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    labels:
+      - stack=media
+    hostname: lazylibrarian
+  #############
+  # Ubooquity #
+  #############
+  ubooquity:
+    image: linuxserver/ubooquity:latest
+    container_name: ubooquity
+    volumes:
+      - /path/to/docker/ubooquity/config:/config
+      - /path/to/data/books:/books
+      - /path/to/data/comics:/comics
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    restart: unless-stopped
+    labels:
+      - stack=media
+    hostname: ubooquity
+    ports:
+      - 2202:2202/tcp
+      - 2203:2203/tcp
+  #########
+  # Mylar #
+  #########
+  mylar:
+    image: linuxserver/mylar:latest
+    container_name: mylar
+    volumes:
+      - /path/to/docker/mylar/config:/config
+      - /path/to/data/comics:/comics
+      - /path/to/data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America\New_York
+    restart: unless-stopped
+    hostname: mylar
+    labels:
+      - stack=media
+    ports:
+      - 8090:8090/tcp
